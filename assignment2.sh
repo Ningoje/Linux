@@ -46,18 +46,20 @@ configure_network_interface() {
         # Update netplan configuration
         cat << EOF > /etc/netplan/50-cloud-init.yaml
 network:
-  version: 2
-  ethernets:
-    eth0:
-      addresses: [192.168.16.10/24]
-      routes:
-        - to: 0.0.0.0/0
-          via: 192.168.16.2
-      nameservers:
-        addresses: [192.168.16.1]
-        search: [home.arpa, localdomain]
-    eth1:
-      addresses: [172.16.1.10/24]
+    version: 2
+    ethernets:
+        eth0:
+            addresses: [10.87.193.200/24]
+            routes:
+              - to: default
+                via: 10.87.193.1
+            nameservers:
+                addresses: [10.87.193.1]
+                search: [home.arpa, localdomain]
+        eth1:
+            addresses: [192.168.100.200/24]
+        eth2:
+            addresses: [172.16.1.200/24]
 EOF
         # Apply netplan configuration
         netplan apply
@@ -84,9 +86,9 @@ update_hosts_file() {
 configure_firewall() {
     print_section_header "Configuring Firewall (UFW)"
     # Enable firewall
-    ufw enable
+    echo "yes" | sudo ufw enable
     # Allow SSH on mgmt network
-    ufw allow from 192.168.1.0/24 to any port 22
+    ufw allow ssh
     # Allow HTTP on both interfaces
     ufw allow http
     # Allow web proxy on both interfaces
